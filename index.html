@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111722">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fitness Ledger">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Fitness Training Ledger</title>
+<style>
+:root{
+  --bg:#0f141d;--panel:#171e29;--panel2:#202936;--line:#2b3646;
+  --text:#f1f3f5;--dim:#9ba7b7;--accent:#8fca6b;--accent2:#62a8dd;
+  --warn:#e4b64f;--danger:#d86b75;--good:#72c6ad;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+body{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+button,input,textarea{font:inherit}
+button{touch-action:manipulation}
+.app{max-width:760px;margin:auto;padding:calc(18px + env(safe-area-inset-top)) 14px 24px}
+.header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.kicker{font-size:11px;color:var(--accent);font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+h1{font-size:27px;margin:4px 0 2px;letter-spacing:-.03em}
+.sub{font-size:13px;color:var(--dim);line-height:1.45}
+.pill{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:8px 10px;color:var(--dim);white-space:nowrap;font-size:12px}
+.tabs{position:sticky;top:env(safe-area-inset-top);z-index:5;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:rgba(15,20,29,.94);backdrop-filter:blur(14px);padding:7px 0 10px}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--dim);padding:10px 4px;border-radius:11px;font-size:12px;font-weight:700}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#102013}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.title{font-weight:800}
+.small{font-size:12px;color:var(--dim)}
+.progress{height:10px;background:var(--panel2);border-radius:999px;overflow:hidden;margin-top:11px}
+.progress>i{display:block;height:100%;background:var(--good);width:0}
+.weeknav{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px}
+.iconbtn{height:42px;border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:12px;font-size:18px}
+.weeklabel{text-align:center;font-weight:800}
+.workout{overflow:hidden;padding:0}
+.workoutHead{padding:15px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.daycode{min-width:48px;font-size:11px;font-weight:800;color:var(--accent2);border:1px solid #35506a;border-radius:7px;padding:5px;text-align:center}
+.workoutName{font-weight:800;font-size:15px;flex:1}
+.status{font-size:12px;color:var(--dim)}
+.workoutBody{border-top:1px solid var(--line);padding:12px}
+.hidden{display:none!important}
+.ex{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px;margin:9px 0}
+.exTop{display:flex;align-items:flex-start;gap:9px}
+.check{appearance:none;width:24px;height:24px;min-width:24px;border-radius:8px;border:1px solid #637083;background:#111722}
+.check:checked{background:var(--good);border-color:var(--good)}
+.check:checked:after{content:"✓";display:block;text-align:center;line-height:22px;font-weight:900;color:#0c241c}
+.exName{font-weight:750;font-size:14px;line-height:1.3}
+.target{font-size:11px;color:var(--dim);margin-top:2px}
+.sets{margin-top:10px}
+.setrow{display:grid;grid-template-columns:30px 1fr 1fr 42px;gap:7px;align-items:center;margin:7px 0}
+.setnum{text-align:center;color:var(--dim);font-size:12px}
+.field{width:100%;border:1px solid var(--line);background:#111722;color:var(--text);border-radius:10px;padding:11px 9px;min-height:42px}
+.field::placeholder{color:#657181}
+.del{border:1px solid var(--line);background:#111722;color:var(--danger);border-radius:10px;height:42px}
+.addset{width:100%;border:1px dashed #526274;background:transparent;color:var(--accent2);padding:10px;border-radius:10px;margin-top:5px}
+.rundata{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.notes{width:100%;min-height:72px;resize:vertical;margin-top:10px}
+.completeBtn{width:100%;border:0;background:var(--accent);color:#102013;padding:13px;border-radius:12px;font-weight:900;margin-top:11px}
+.completeBtn.done{background:var(--good)}
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.metric{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:11px}
+.metric label{font-size:11px;color:var(--dim)}
+.metric strong{display:block;font-size:20px;margin-top:4px}
+.historyItem{border-bottom:1px solid var(--line);padding:10px 0}
+.historyItem:last-child{border-bottom:0}
+.toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:12px;border-radius:12px}
+.btn.danger{color:#f19aa3;border-color:#604049}
+.install{border-color:#445f36;background:#17231a}
+.bottom{position:fixed;left:0;right:0;bottom:0;z-index:10;background:rgba(15,20,29,.95);backdrop-filter:blur(15px);border-top:1px solid var(--line);padding:8px 12px calc(8px + env(safe-area-inset-bottom))}
+.bottomInner{max-width:760px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bottom button{border:0;border-radius:12px;padding:12px;font-weight:800}
+.todayBtn{background:var(--accent);color:#102013}
+.backupBtn{background:var(--panel2);color:var(--text)}
+@media(min-width:650px){.metrics{grid-template-columns:repeat(4,1fr)}.rundata{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+<div class="bottom">
+  <div class="bottomInner">
+    <button class="todayBtn" id="jumpToday">今日训练</button>
+    <button class="backupBtn" id="quickExport">导出备份</button>
+  </div>
+</div>
+<script>
+const PLAN=[
+ {id:'mon',code:'MON',title:'5 km 轻松跑',type:'run',meta:'有氧 / 恢复',items:[{name:'5 km 轻松跑',target:'保持可持续节奏，不追求速度'}]},
+ {id:'tue',code:'TUE',title:'力量 A — 上半身',type:'strength',meta:'胸 / 背 / 肩 / 手臂',items:[
+  {name:'Multi Press — Chest Press',target:'3 × 8–12',sets:3},
+  {name:'Lateral Pulldown',target:'3 × 8–12',sets:3},
+  {name:'Lateral Low Row',target:'3 × 8–12',sets:3},
+  {name:'Multi Press — Shoulder Press',target:'3 × 8–12',sets:3},
+  {name:'Dual Adjustable Pulley — Face Pull',target:'3 × 12–15',sets:3},
+  {name:'Cable Triceps Pushdown',target:'2 × 10–15',sets:2},
+  {name:'Cable Biceps Curl',target:'2 × 10–15',sets:2}]},
+ {id:'wed',code:'WED',title:'5 km 轻松跑',type:'run',meta:'有氧',items:[{name:'5 km 轻松跑',target:'稳定心率为主'}]},
+ {id:'thu',code:'THU',title:'力量 B — 下半身 + Core',type:'strength',meta:'腿 / 臀 / 核心',items:[
+  {name:'Leg Extension',target:'3 × 10–15',sets:3},
+  {name:'Seated Leg Curl',target:'3 × 10–15',sets:3},
+  {name:'Hip Abductor',target:'3 × 12–15',sets:3},
+  {name:'Hip Adductor',target:'2 × 12–15',sets:2},
+  {name:'Cable Pull-through',target:'3 × 10–15 · 可选',sets:3},
+  {name:'Cable Crunch',target:'3 × 12–15',sets:3},
+  {name:'Plank',target:'3 × 30–60 sec',sets:3}]},
+ {id:'fri',code:'FRI',title:'恢复日',type:'recovery',meta:'休息 / 步行',items:[{name:'轻松步行或完全休息',target:'不安排高强度训练'}]},
+ {id:'sat',code:'SAT',title:'力量 C — 全身',type:'strength',meta:'第二次刺激主要肌群',items:[
+  {name:'Multi Press',target:'3 × 8–12',sets:3},
+  {name:'Lateral Pulldown',target:'3 × 8–12',sets:3},
+  {name:'Lateral Low Row',target:'3 × 8–12',sets:3},
+  {name:'Seated Leg Curl',target:'3 × 10–15',sets:3},
+  {name:'Leg Extension',target:'2 × 10–15',sets:2},
+  {name:'Hip Abductor',target:'2 × 12–15',sets:2},
+  {name:'Cable Lateral Raise',target:'3 × 12–15',sets:3}]},
+ {id:'sun',code:'SUN',title:'5 km 轻松跑 / 户外活动',type:'run',meta:'有氧 + 活动',items:[{name:'5 km 轻松跑或户外活动',target:'任选其一，不要求高强度'}]}
+];
+
+const KEY='fitness-ledger-pwa-v2';
+const emptyState=()=>({week:1,tab:'plan',open:{},weeks:{},body:{},settings:{startDate:''}});
+let state=emptyState();
+try{const raw=localStorage.getItem(KEY);if(raw)state=Object.assign(emptyState(),JSON.parse(raw));}catch(e){}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function wk(){const k='w'+state.week; if(!state.weeks[k])state.weeks[k]={}; return state.weeks[k]}
+function daystate(id){const w=wk(); if(!w[id])w[id]={done:false,items:{},notes:''}; return w[id]}
+function itemstate(day,i,item){const d=daystate(day); if(!d.items[i]) d.items[i]={done:false,sets:Array.from({length:item.sets||0},()=>({kg:'',reps:''})),run:{dist:'',time:'',hr:'',rpe:''}}; return d.items[i]}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function pct(){let t=0,d=0;PLAN.forEach(day=>day.items.forEach((it,i)=>{t++;if(itemstate(day.id,i,it).done)d++}));return t?Math.round(d/t*100):0}
+function todayPlanId(){return ['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()]}
+function setRow(day,i,sidx,set){
+ return `<div class="setrow"><div class="setnum">${sidx+1}</div>
+ <input class="field" inputmode="decimal" data-set="${day}|${i}|${sidx}|kg" value="${esc(set.kg)}" placeholder="kg">
+ <input class="field" inputmode="numeric" data-set="${day}|${i}|${sidx}|reps" value="${esc(set.reps)}" placeholder="reps">
+ <button class="del" data-delset="${day}|${i}|${sidx}" aria-label="删除组">−</button></div>`;
+}
+function exercise(day,it,i){
+ const s=itemstate(day.id,i,it);
+ return `<div class="ex"><div class="exTop">
+ <input class="check" type="checkbox" data-itemcheck="${day.id}|${i}" ${s.done?'checked':''}>
+ <div><div class="exName">${it.name}</div><div class="target">目标：${it.target}</div></div></div>
+ <div class="sets">${s.sets.map((x,j)=>setRow(day.id,i,j,x)).join('')}</div>
+ <button class="addset" data-addset="${day.id}|${i}">＋ 添加一组</button></div>`;
+}
+function runExercise(day,it,i){
+ const s=itemstate(day.id,i,it),r=s.run||{};
+ return `<div class="ex"><div class="exTop">
+ <input class="check" type="checkbox" data-itemcheck="${day.id}|${i}" ${s.done?'checked':''}>
+ <div><div class="exName">${it.name}</div><div class="target">目标：${it.target}</div></div></div>
+ <div class="rundata">
+ <input class="field" inputmode="decimal" data-run="${day.id}|${i}|dist" value="${esc(r.dist)}" placeholder="距离 km">
+ <input class="field" data-run="${day.id}|${i}|time" value="${esc(r.time)}" placeholder="时间 00:00">
+ <input class="field" inputmode="numeric" data-run="${day.id}|${i}|hr" value="${esc(r.hr)}" placeholder="平均心率">
+ <input class="field" inputmode="numeric" data-run="${day.id}|${i}|rpe" value="${esc(r.rpe)}" placeholder="RPE 1–10">
+ </div></div>`;
+}
+function workoutCard(day){
+ const ds=daystate(day.id), open=state.open[day.id] ?? (day.id===todayPlanId());
+ const done=day.items.filter((it,i)=>itemstate(day.id,i,it).done).length;
+ const body=day.type==='strength'?day.items.map((it,i)=>exercise(day,it,i)).join(''):day.items.map((it,i)=>runExercise(day,it,i)).join('');
+ return `<section class="card workout" id="day-${day.id}">
+ <div class="workoutHead" data-toggle="${day.id}">
+ <div class="daycode">${day.code}</div><div><div class="workoutName">${day.title}</div><div class="small">${day.meta}</div></div>
+ <div class="status">${done}/${day.items.length}</div></div>
+ <div class="workoutBody ${open?'':'hidden'}">${body}
+ <textarea class="field notes" data-notes="${day.id}" placeholder="当天备注：状态、动作感受、疼痛/不适、下次调整……">${esc(ds.notes)}</textarea>
+ <button class="completeBtn ${ds.done?'done':''}" data-daydone="${day.id}">${ds.done?'✓ 本日已完成':'完成本日训练'}</button>
+ </div></section>`;
+}
+function planView(){
+ const p=pct();
+ return `<div class="card"><div class="weeknav">
+ <button class="iconbtn" id="prevWeek">‹</button><div class="weeklabel">Week ${state.week} / 8</div><button class="iconbtn" id="nextWeek">›</button>
+ </div><div class="progress"><i style="width:${p}%"></i></div><div class="row between small" style="margin-top:7px"><span>本周完成度</span><span>${p}%</span></div></div>
+ ${PLAN.map(workoutCard).join('')}`;
+}
+function todayView(){
+ const id=todayPlanId(), day=PLAN.find(x=>x.id===id);
+ return `<div class="card"><div class="kicker">Today</div><div class="title" style="font-size:21px;margin-top:5px">${day.title}</div>
+ <div class="small" style="margin-top:4px">系统根据今天星期自动定位；仍可在“计划”中记录其他训练日。</div></div>${workoutCard(day)}`;
+}
+function historyView(){
+ let rows=[];
+ for(let w=1;w<=8;w++){
+  const ww=state.weeks['w'+w]||{};
+  let total=0,done=0,days=0;
+  PLAN.forEach(day=>{const ds=ww[day.id];if(ds){if(ds.done)days++;day.items.forEach((it,i)=>{total++;if(ds.items?.[i]?.done)done++})}});
+  rows.push(`<div class="historyItem"><div class="row between"><strong>Week ${w}</strong><span class="small">${done}/${total||PLAN.reduce((a,d)=>a+d.items.length,0)} exercises · ${days} days completed</span></div></div>`);
+ }
+ return `<div class="card"><div class="title">8 周历史</div><div class="small">用于快速查看每周完成情况。</div>${rows.join('')}</div>`;
+}
+function settingsView(){
+ return `<div class="card install"><div class="title">安装到 iPhone 主屏幕</div>
+ <div class="small" style="margin-top:7px;line-height:1.6">将本文件夹部署到 HTTPS 网站后，用 iPhone Safari 打开网址 → 分享 → “添加到主屏幕”。以后可像 App 一样启动。Chrome iOS 也可访问网址，但添加到主屏幕建议使用 Safari。</div></div>
+ <div class="card"><div class="title">身体数据</div><div class="metrics" style="margin-top:10px">
+ ${['weight|体重 kg','waist|腰围 cm','resthr|静息心率','note|当前目标'].map(x=>{const [k,l]=x.split('|');return `<div class="metric"><label>${l}</label><input class="field" data-body="${k}" value="${esc(state.body[k]||'')}" placeholder="记录"></div>`}).join('')}
+ </div></div>
+ <div class="card"><div class="title">数据与备份</div><div class="small" style="margin:5px 0 11px">记录保存在当前浏览器设备。定期导出 JSON 可防止清理浏览器数据造成丢失。</div>
+ <div class="toolbar"><button class="btn" id="exportBtn">导出 JSON</button><button class="btn" id="importBtn">导入 JSON</button><input class="hidden" type="file" id="importFile" accept=".json,application/json"><button class="btn" id="printBtn">打印 / PDF</button><button class="btn danger" id="resetBtn">清空全部数据</button></div></div>`;
+}
+function render(){
+ const content=state.tab==='today'?todayView():state.tab==='history'?historyView():state.tab==='settings'?settingsView():planView();
+ document.getElementById('app').innerHTML=`
+ <div class="header"><div><div class="kicker">6–8 Week Strength + Cardio</div><h1>Fitness Ledger</h1><div class="sub">iPhone / PWA 优化版 · 每组独立记录 kg × reps · 自动本地保存</div></div><div class="pill">Week ${state.week}</div></div>
+ <div class="tabs">${[['today','今天'],['plan','计划'],['history','历史'],['settings','设置']].map(([k,l])=>`<button class="tab ${state.tab===k?'active':''}" data-tab="${k}">${l}</button>`).join('')}</div>${content}`;
+ bind();
+}
+function exportData(){
+ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='fitness-ledger-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+}
+function bind(){
+ document.querySelectorAll('[data-tab]').forEach(x=>x.onclick=()=>{state.tab=x.dataset.tab;save();render()});
+ document.querySelectorAll('[data-toggle]').forEach(x=>x.onclick=()=>{const k=x.dataset.toggle;state.open[k]=!(state.open[k]??false);save();render()});
+ document.querySelectorAll('[data-itemcheck]').forEach(x=>x.onchange=()=>{const [d,i]=x.dataset.itemcheck.split('|');const it=PLAN.find(z=>z.id===d).items[+i];itemstate(d,+i,it).done=x.checked;save();render()});
+ document.querySelectorAll('[data-set]').forEach(x=>x.onchange=()=>{const [d,i,s,k]=x.dataset.set.split('|');const it=PLAN.find(z=>z.id===d).items[+i];itemstate(d,+i,it).sets[+s][k]=x.value;save()});
+ document.querySelectorAll('[data-addset]').forEach(x=>x.onclick=()=>{const [d,i]=x.dataset.addset.split('|');const it=PLAN.find(z=>z.id===d).items[+i];itemstate(d,+i,it).sets.push({kg:'',reps:''});save();render()});
+ document.querySelectorAll('[data-delset]').forEach(x=>x.onclick=()=>{const [d,i,s]=x.dataset.delset.split('|');const it=PLAN.find(z=>z.id===d).items[+i];const arr=itemstate(d,+i,it).sets;if(arr.length>1)arr.splice(+s,1);save();render()});
+ document.querySelectorAll('[data-run]').forEach(x=>x.onchange=()=>{const [d,i,k]=x.dataset.run.split('|');const it=PLAN.find(z=>z.id===d).items[+i];itemstate(d,+i,it).run[k]=x.value;save()});
+ document.querySelectorAll('[data-notes]').forEach(x=>x.oninput=()=>{daystate(x.dataset.notes).notes=x.value;save()});
+ document.querySelectorAll('[data-daydone]').forEach(x=>x.onclick=()=>{const d=daystate(x.dataset.daydone);d.done=!d.done;save();render()});
+ document.querySelectorAll('[data-body]').forEach(x=>x.onchange=()=>{state.body[x.dataset.body]=x.value;save()});
+ if(document.getElementById('prevWeek'))document.getElementById('prevWeek').onclick=()=>{state.week=Math.max(1,state.week-1);save();render()};
+ if(document.getElementById('nextWeek'))document.getElementById('nextWeek').onclick=()=>{state.week=Math.min(8,state.week+1);save();render()};
+ if(document.getElementById('exportBtn'))document.getElementById('exportBtn').onclick=exportData;
+ if(document.getElementById('printBtn'))document.getElementById('printBtn').onclick=()=>window.print();
+ if(document.getElementById('importBtn'))document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
+ if(document.getElementById('importFile'))document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=Object.assign(emptyState(),JSON.parse(r.result));save();render();alert('导入成功');}catch(err){alert('JSON 文件无法读取')}};r.readAsText(f)};
+ if(document.getElementById('resetBtn'))document.getElementById('resetBtn').onclick=()=>{if(confirm('确定清空 8 周全部训练记录吗？')){state=emptyState();save();render()}};
+}
+document.getElementById('jumpToday').onclick=()=>{state.tab='today';save();render();window.scrollTo({top:0,behavior:'smooth'})};
+document.getElementById('quickExport').onclick=exportData;
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
+render();
+</script>
+</body>
+</html>

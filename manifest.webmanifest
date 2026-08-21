@@ -1,0 +1,17 @@
+{
+  "name": "Fitness Training Ledger",
+  "short_name": "Fitness Ledger",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f141d",
+  "theme_color": "#111722",
+  "description": "6–8 week strength and cardio training ledger.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
